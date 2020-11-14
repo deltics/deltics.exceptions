@@ -1,0 +1,20 @@
+{
+  id: "deltics.exceptions",
+  summary: "A tiny package that consolidates exceptions for consistency in packages targetting support for multiple versions of the Delphi compiler.",
+  tags: [
+    "deltics",
+    "exceptions"
+  ],
+  copyright: "\u00A92020 Jolyon Direnko-Smith",
+  language: "en",
+  content: "source",
+  dependencies: [
+    "deltics.inc:1.0.2"
+  ],
+  source: {
+      files: [
+        "src\\deltics.exceptions.inc",
+        "src\\Deltics.Exceptions.pas"
+      ]
+    }
+}
