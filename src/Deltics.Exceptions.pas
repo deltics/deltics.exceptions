@@ -1,7 +1,7 @@
 {
   * MIT LICENSE *
 
-  Copyright © 2008 Jolyon Smith
+  Copyright © 2020 Jolyon Smith
 
   Permission is hereby granted, free of charge, to any person obtaining a copy of
    this software and associated documentation files (the "Software"), to deal in
@@ -36,11 +36,7 @@
   github          : deltics/deltics.rtl
 }
 
-{$i deltics.rtl.inc}
-
-{$ifdef debugDelticsExceptions}
-  {$debuginfo ON}
-{$endif}
+{$i deltics.exceptions.inc}
 
   unit Deltics.Exceptions;
 
@@ -54,16 +50,16 @@ interface
   type
     Exception = SysUtils.Exception;
 
-    EArgumentException      = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.EArgumentException {$endif};
-    ENotSupportedException  = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.ENotSupportedException {$endif};
+    EArgumentException  = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.EArgumentException {$endif};
+    ENotSupported       = {$ifdef __DELPHI2009} class(Exception) {$else} SysUtils.ENotSupportedException {$endif};
 
     ENotImplemented = class({$ifdef __DELPHI2010} Exception {$else} SysUtils.ENotImplemented {$endif})
     public
+      constructor Create; overload;
       constructor Create(const aClass: TClass; const aMethodName: String); overload;
       constructor Create(const aObject: TObject; const aMethodName: String); overload;
     end;
 
-//    EAccessDenied = class(EOSError);
 
 
 
@@ -71,6 +67,13 @@ implementation
 
 
 { ENotImplemented -------------------------------------------------------------------------------- }
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  constructor ENotImplemented.Create;
+  begin
+    inherited Create('This has not been implemented');
+  end;
+
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   constructor ENotImplemented.Create(const aClass: TClass;
@@ -86,6 +89,7 @@ implementation
   begin
     inherited CreateFmt('%s.%s has not been implemented', [aObject.ClassName, aMethodName]);
   end;
+
 
 
 

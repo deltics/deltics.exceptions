@@ -1,82 +1,146 @@
 program test;
 
+{$apptype console}
+
 {$i deltics.inc}
 
 uses
-{$ifdef DELPHI2010__}
   SysUtils,
-{$endif}
   Deltics.Smoketest,
-  Deltics.Exceptions;
+  Deltics.Exceptions in '..\src\Deltics.Exceptions.pas';
 
 
   type
     TTests = class(TTest)
+      procedure ExceptionIsAliasForSysUtilsException;
+    {$ifdef DELPHI2010__}
+      procedure EArgumentExceptionIsAliasForSysUtilsEArgumentException;
+      procedure ENotSupportedIsAliasForSysUtilsENotSupported;
+    {$else}
+      procedure EArgumentExceptionExtendsException;
+      procedure ENotSupportedExtendsException;
+    {$endif}
+    {$ifdef DELPHIXE__}
+      procedure ENotImplementedExtendsSysUtilsENotImplemented;
+    {$else}
+      procedure ENotImplementedExtendsException;
+    {$endif}
       procedure EArgumentExceptionIsRaisedWithSpecifiedMessage;
-      procedure EArgumentExceptionDerivesFromExpectedBaseClass;
-      procedure ENotSupportedExceptionDerivesFromExpectedBaseClass;
-      procedure ENotImplementedDerivesFromExpectedBaseClass;
+      procedure ENotImplementedIsRaisedWithDefaultMessage;
+      procedure ENotImplementedIsRaisedWithMessageConstructedFromClassAndMethodName;
+      procedure ENotImplementedIsRaisedWithMessageConstructedFromObjectAndMethodName;
+      procedure ENotImplementedIsRaisedWithSpecifiedMessage;
+      procedure ENotSupportedIsRaisedWithSpecifiedMessage;
     end;
 
 
 { TTests }
 
+  procedure TTests.ExceptionIsAliasForSysUtilsException;
+  begin
+    Test('Exception.ClassInfo = SysUtils.Exception.ClassInfo').Assert(Exception.ClassInfo).Equals(SysUtils.Exception.ClassInfo);
+  end;
+
+
+{$ifdef DELPHI2010__}
+  procedure TTests.EArgumentExceptionIsAliasForSysUtilsEArgumentException;
+  begin
+    Test('EArgumentException.ClassInfo').Assert(EArgumentException.ClassInfo).Equals(SysUtils.EArgumentException.ClassInfo);
+  end;
+
+
+  procedure TTests.ENotSupportedIsAliasForSysUtilsENotSupported;
+  begin
+    Test('ENotSupported.ClassInfo').Assert(ENotSupported.ClassInfo).Equals(SysUtils.ENotSupportedException.ClassInfo);
+  end;
+
+{$else}
+
+  procedure TTests.EArgumentExceptionExtendsException;
+  begin
+    Test('EArgumentException.ClassParent').Assert(EArgumentException.ClassParent = Exception);
+  end;
+
+
+  procedure TTests.ENotSupportedExtendsException;
+  begin
+    Test('ENotSupported.ClassParent').Assert(ENotSupported.ClassParent = Exception);
+  end;
+{$endif}
+
+
+{$ifdef DELPHIXE__}
+  procedure TTests.ENotImplementedExtendsSysUtilsENotImplemented;
+  begin
+    Test('ENotImplemented.ClassParent').Assert(ENotImplemented.ClassParent = SysUtils.ENotImplemented);
+  end;
+
+{$else}
+
+  procedure TTests.ENotImplementedExtendsException;
+  begin
+    Test('ENotImplemented.ClassParent').Assert(ENotImplemented.ClassParent = Exception);
+  end;
+{$endif}
+
+
+
   procedure TTests.EArgumentExceptionIsRaisedWithSpecifiedMessage;
+  const
+    MSG = 'An EArgumentException';
   begin
-    try
-      raise EArgumentException.Create('An EArgumentException');
+    Test.RaisesException(EArgumentException, MSG);
 
-      Test.AssertException(EArgumentException, 'An EArgumentException');
-
-    except
-      Test.AssertException(EArgumentException, 'An EArgumentException');
-    end;
+    raise EArgumentException.Create(MSG);
   end;
 
 
-  procedure TTests.EArgumentExceptionDerivesFromExpectedBaseClass;
+  procedure TTests.ENotImplementedIsRaisedWithDefaultMessage;
   begin
-    try
-      raise EArgumentException.Create('');
+    Test.RaisesException(ENotImplemented, 'This has not been implemented');
 
-    except
-    {$ifdef DELPHI2010__}
-      Test.AssertBaseException(SysUtils.EArgumentException);
-    {$else}
-      Test.AssertBaseException(SysUtils.Exception);
-    {$endif}
-    end;
+    raise ENotImplemented.Create;
   end;
 
 
-  procedure TTests.ENotSupportedExceptionDerivesFromExpectedBaseClass;
+  procedure TTests.ENotImplementedIsRaisedWithMessageConstructedFromClassAndMethodName;
   begin
-    try
-      raise ENotSupportedException.Create('');
+    Test.RaisesException(ENotImplemented, 'TTests.Foo has not been implemented');
 
-    except
-    {$ifdef DELPHI2010__}
-      Test.AssertBaseException(SysUtils.ENotSupportedException);
-    {$else}
-      Test.AssertBaseException(SysUtils.Exception);
-    {$endif}
-    end;
+    raise ENotImplemented.Create(TTests, 'Foo');
   end;
 
 
-  procedure TTests.ENotImplementedDerivesFromExpectedBaseClass;
+  procedure TTests.ENotImplementedIsRaisedWithMessageConstructedFromObjectAndMethodName;
   begin
-    try
-      raise ENotImplemented.Create('');
+    Test.RaisesException(ENotImplemented, 'TTests.Foo has not been implemented');
 
-    except
-    {$ifdef DELPHI2010__}
-      Test.AssertBaseException(SysUtils.ENotImplemented);
-    {$else}
-      Test.AssertBaseException(SysUtils.Exception);
-    {$endif}
-    end;
+    raise ENotImplemented.Create(self, 'Foo');
   end;
+
+
+  procedure TTests.ENotImplementedIsRaisedWithSpecifiedMessage;
+  const
+    MSG = 'Some specific message';
+  begin
+    Test.RaisesException(ENotImplemented, MSG);
+
+    raise ENotImplemented.Create(MSG);
+  end;
+
+
+  procedure TTests.ENotSupportedIsRaisedWithSpecifiedMessage;
+  const
+    MSG = 'An ENotSupported';
+  begin
+    Test.RaisesException(ENotSupported, MSG);
+
+    raise ENotSupported.Create(MSG);
+  end;
+
+
+
+
 
 
 begin

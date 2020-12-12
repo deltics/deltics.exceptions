@@ -3,7 +3,7 @@
 
 {$debuginfo OFF}
 
-{$ifdef Deltics_Exceptions}
+{$ifdef debug_DelticsExceptions}
   {$undef InlineMethods}
   {$debuginfo ON}
 {$endif}
