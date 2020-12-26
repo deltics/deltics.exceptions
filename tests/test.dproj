@@ -95,6 +95,10 @@
         <None Include=".duget"/>
         <None Include="..\.duspec"/>
         <None Include="..\src\deltics.exceptions.inc"/>
+        <None Include="..\.gitignore"/>
+        <None Include="..\GitVersion.yml"/>
+        <None Include="..\LICENSE"/>
+        <None Include="..\README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

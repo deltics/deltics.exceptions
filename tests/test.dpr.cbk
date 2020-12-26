@@ -1,4 +1,4 @@
-program test;
+﻿program test;
 
 {$apptype console}
 
